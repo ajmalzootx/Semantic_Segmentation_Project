@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Semantic Segmentation</title>
+</head>
+<body>
+    <h1>Semantic Segmentation of Aerial Imagery</h1>
+    <form id="upload-form">
+        <input type="file" id="image-upload" accept=".png, .jpg, .jpeg" />
+        <button type="button" onclick="predict()">Predict</button>
+    </form>
+    <div id="output"></div>
+
+    <script>
+        function predict() {
+            // Get the uploaded image from the input element
+            const imageFile = document.getElementById('image-upload').files[0];
+            
+            // Create a FormData object to send the image as a multipart/form-data
+            const formData = new FormData();
+            formData.append('image', imageFile);
+
+            // Send the image to the Flask API using AJAX
+            fetch('/segment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob()) // Get the response as a blob
+            .then(blob => {
+                // Create an image element and set the segmented image as the source
+                const segmentedImage = document.createElement('img');
+                segmentedImage.src = URL.createObjectURL(blob);
+                segmentedImage.width = 500;
+                segmentedImage.height = 400;
+                
+                // Clear the previous output and show the segmented image
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = '';
+                outputDiv.appendChild(segmentedImage);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
